@@ -120,7 +120,7 @@ elif tab_selection == "🔍 Database Query":
     if connection:
         # Get min and max votes from database for slider
         cursor = connection.cursor()
-        cursor.execute("SELECT MIN(votes), MAX(votes) FROM restaurant_table WHERE votes IS NOT NULL")
+        cursor.execute("SELECT MIN(votes), MAX(votes) FROM business_location WHERE votes IS NOT NULL")
         min_votes, max_votes = cursor.fetchone()
         cursor.close()
         
@@ -159,7 +159,7 @@ elif tab_selection == "🔍 Database Query":
                 # Build SQL query with filters
                 query = """
                     SELECT name, votes, city
-                    FROM restaurant_table
+                    FROM business_location
                     WHERE votes BETWEEN %s AND %s
                 """
                 params = [vote_range[0], vote_range[1]]
@@ -217,7 +217,7 @@ elif tab_selection == "🗺️ Interactive Map":
                 # Query location data
                 query = """
                     SELECT name, latitude, longitude
-                    FROM restaurant_table
+                    FROM business_location
                     WHERE latitude IS NOT NULL 
                     AND longitude IS NOT NULL
                 """
