@@ -9,7 +9,7 @@ import pandas as pd
 import mysql.connector
 from mysql.connector import Error
 import folium
-from streamlit_folium import st_folium
+import streamlit.components.v1 as components
 
 # Page configuration with custom colors
 st.set_page_config(
@@ -104,7 +104,7 @@ if page == "📋 HW Summary":
         st.write("**Name:** Jinegwo Makuo")
         st.write("**Course:** ITOM6265")
         st.write("**Assignment:** Homework 1 - Restaurant Dashboard")
-        st.write("**Date:** November 2024")
+        st.write("**Date:** November 2025")
         st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
@@ -280,24 +280,31 @@ elif page == "🗺️ Q2-Maps":
                 )
                 
                 # Add blue markers for each restaurant
+                marker_count = 0
                 for idx, row in locations_df.iterrows():
                     try:
                         lat = float(row['latitude'])
                         lon = float(row['longitude'])
                         name = str(row['name'])
+                        
                         folium.Marker(
                             location=[lat, lon],
-                            popup=folium.Popup(name, max_width=300),
+                            popup=name,
                             tooltip=name,
-                            icon=folium.Icon(color='blue', icon='cutlery', prefix='fa')
+                            icon=folium.Icon(color='blue')
                         ).add_to(london_map)
-                    except Exception:
+                        marker_count += 1
+                    except Exception as e:
                         continue
                 
-                st.success(f"✅ Successfully mapped {len(locations_df)} restaurants")
+                st.success(f"✅ Successfully mapped {marker_count} restaurants")
                 
-                # Display map
-                st_folium(london_map, width=None, height=700, use_container_width=True)
+                # Display map using HTML rendering
+                map_html = london_map._repr_html_()
+                
+                # Use iframe to display the map
+                import streamlit.components.v1 as components
+                components.html(map_html, height=700, scrolling=False)
                 
                 # Show statistics
                 st.markdown("---")
