@@ -206,14 +206,64 @@ elif tab_selection == "🔍 Database Query":
     else:
         st.error("❌ Database connection not available. Please check your credentials.")
 
-            with col3:
+# Tab 3: Interactive Map
+elif tab_selection == "🗺️ Interactive Map":
+    st.markdown("<h1 class='main-header'>Restaurant Locations Map</h1>", unsafe_allow_html=True)
+    
+    if connection:
+        st.caption("Map of restaurants in London. Click on teardrop to check names.")
+        
+        # Display map button
+        if st.button("🗺️ Display map!", type="primary"):
+            with st.spinner("Loading map..."):
+                try:
+                    # Query location data
+                    query = """
+                        SELECT name, latitude, longitude
+                        FROM business_location
+                        WHERE latitude IS NOT NULL 
+                        AND longitude IS NOT NULL
+                    """
+                    
+                    # Use pandas to execute query
+                    df_locations = pd.read_sql(query, connection)
+                    
+                    if not df_locations.empty:
+                        st.success(f"✅ Displaying {len(df_locations)} restaurants on map")
+                        
+                        # Create map centered on London
+                        m = folium.Map(
+                            location=[51.5074, -0.1278],
+                            zoom_start=12,
+                            tiles='CartoDB positron'
+                        )
+                        
+                        # Add markers for each restaurant
+                        for idx, row in df_locations.iterrows():
+                            folium.Marker(
+                                location=[row['latitude'], row['longitude']],
+                                popup=folium.Popup(row['name'], max_width=200),
+                                tooltip=row['name'],
+                                icon=folium.Icon(color='blue', icon='info-sign')
+                            ).add_to(m)
+                        
+                        # Display map
+                        st_folium(m, width=1200, height=600)
+                        
+                        # Show map statistics
+                        st.markdown("---")
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("🍽️ Total Restaurants", len(df_locations))
+                        with col2:
+                            st.metric("📍 Avg Latitude", f"{df_locations['latitude'].mean():.4f}")
+                        with col3:
                             st.metric("📍 Avg Longitude", f"{df_locations['longitude'].mean():.4f}")
                     else:
                         st.warning("⚠️ No restaurant locations found in database.")
                         
                 except Exception as err:
                     st.error(f"❌ Error creating map: {err}")
-                    st.error(f"Details: {str(err)}")
         else:
             st.info("👆 Click the button above to display the restaurant map!")
     else:
