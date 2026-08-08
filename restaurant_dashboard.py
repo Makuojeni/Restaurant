@@ -289,9 +289,9 @@ elif page == "🗺️ Q2-Maps":
                         
                         folium.Marker(
                             location=[lat, lon],
-                            popup=name,
+                            popup=folium.Popup(name, max_width=300),
                             tooltip=name,
-                            icon=folium.Icon(color='blue')
+                            icon=folium.Icon(color='blue', icon='cutlery', prefix='fa')
                         ).add_to(london_map)
                         marker_count += 1
                     except Exception as e:
@@ -303,7 +303,6 @@ elif page == "🗺️ Q2-Maps":
                 map_html = london_map._repr_html_()
                 
                 # Use iframe to display the map
-                import streamlit.components.v1 as components
                 components.html(map_html, height=700, scrolling=False)
                 
                 # Show statistics
